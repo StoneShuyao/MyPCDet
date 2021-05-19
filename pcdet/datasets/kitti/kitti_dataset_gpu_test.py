@@ -384,6 +384,7 @@ class KittiDataset(DatasetTemplate):
 
 
 def create_kitti_infos(dataset_cfg, class_names, data_path, save_path, workers=4):
+    # print(data_path)
     dataset = KittiDataset(dataset_cfg=dataset_cfg, class_names=class_names, root_path=data_path, training=False)
     train_split, val_split = 'train', 'val'
 
@@ -436,6 +437,6 @@ if __name__ == '__main__':
             class_names=['Car', 'Pedestrian', 'Cyclist'],
             # data_path=ROOT_DIR / 'data' / 'kitti',
             # save_path=ROOT_DIR / 'data' / 'kitti'
-            data_path=Path('/mnt/ssd/shishuyao/detection/kitti_train/data'),
-            save_path=Path('/mnt/ssd/shishuyao/detection/kitti_train/data')
+            data_path=Path('/home/shuyao/Documents/PCDet/MyPCDet/data/kitti'),
+            save_path=Path('/home/shuyao/Documents/PCDet/MyPCDet/data/kitti')
         )
