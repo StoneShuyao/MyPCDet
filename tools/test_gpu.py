@@ -149,7 +149,7 @@ def main():
         args.batch_size = args.batch_size // total_gpus
 
     # output_dir = cfg.ROOT_DIR / 'output' / cfg.EXP_GROUP_PATH / cfg.TAG / args.extra_tag
-    output_dir = 'mnt' / 'ssd' / 'shishuyao' / 'detection' / 'kitti_train' / 'output' / cfg.EXP_GROUP_PATH / cfg.TAG / args.extra_tag
+    output_dir = 'mnt/ssd/shishuyao/detection/kitti_train/output'/ cfg.EXP_GROUP_PATH / cfg.TAG / args.extra_tag
     output_dir.mkdir(parents=True, exist_ok=True)
 
     eval_output_dir = output_dir / 'eval'
