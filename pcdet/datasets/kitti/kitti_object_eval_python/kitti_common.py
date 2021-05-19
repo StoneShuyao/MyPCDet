@@ -44,7 +44,7 @@ def get_label_path(idx, prefix, training=True, relative_path=True):
 
 
 def get_velodyne_path(idx, prefix, training=True, relative_path=True):
-    return get_kitti_info_path(idx, prefix, 'velodyne_mini', '.bin', training,
+    return get_kitti_info_path(idx, prefix, 'velodyne', '.bin', training,
                                relative_path)
 
 '''
