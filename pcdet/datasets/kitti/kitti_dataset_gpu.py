@@ -436,6 +436,6 @@ if __name__ == '__main__':
             class_names=['Car', 'Pedestrian', 'Cyclist'],
             # data_path=ROOT_DIR / 'data' / 'kitti',
             # save_path=ROOT_DIR / 'data' / 'kitti'
-            data_path='mnt/ssd/shishuyao/detection/kitti_train/data',
-            save_path='mnt/ssd/shishuyao/detection/kitti_train/data'
+            data_path=Path('mnt/ssd/shishuyao/detection/kitti_train/data').resolve(),
+            save_path=Path('mnt/ssd/shishuyao/detection/kitti_train/data').resolve()
         )
