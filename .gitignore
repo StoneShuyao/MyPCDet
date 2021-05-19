@@ -1,11 +1,15 @@
 **__pycache__**
 **build**
+**data**
 **egg-info**
 **dist**
+**output**
 *.pyc
 venv/
+pcdet/version.py
 *.idea/
 *.so
 *.pth
 *.zip
+*.sh
 
