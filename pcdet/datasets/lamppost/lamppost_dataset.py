@@ -36,6 +36,9 @@ class LamppostDataset(DatasetTemplate):
         self.sample_file_list = pc_file_list
         self.label_file_list = label_list
 
+        self.annos  = []
+        self.
+
     def get_label(self, idx):
         label_file = self.label_file_list[idx]
         assert label_file.exists()
@@ -82,7 +85,6 @@ class LamppostDataset(DatasetTemplate):
         for index, box_dict in enumerate(pred_dicts):
             single_pred_dict = generate_single_sample_dict(box_dict)
             single_pred_dict['frame_id'] = batch_dict['frame_id'][index]
-            single_pred_dict['metadata'] = batch_dict['metadata'][index]
             annos.append(single_pred_dict)
 
         return annos
