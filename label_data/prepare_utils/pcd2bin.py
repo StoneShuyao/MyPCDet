@@ -50,7 +50,7 @@ def rotate2xy(pcd):
     plane_model1, inliers1 = pcd_r.segment_plane(distance_threshold=plane_threshold, ransac_n=3,
                                                  num_iterations=segment_interations)
     # print(plane_model1)
-    pcd_final = copy.deepcopy(pcd_r).translate((0, 0, plane_model1[3] / plane_model[2] - 2))
+    pcd_final = copy.deepcopy(pcd_r).translate((0, 0, plane_model1[3] / plane_model[2] - 1.7))
     return pcd_final
 
 def process_pcd(filepath):
