@@ -37,12 +37,24 @@ class LamppostDataset(DatasetTemplate):
         self.label_file_list = label_list
 
         self.annos  = []
-        self.
+        self.get_annos()
 
     def get_label(self, idx):
         label_file = self.label_file_list[idx]
         assert label_file.exists()
         return read_label.get_objects_from_label(label_file)
+
+    def get_annos(self):
+        for index, label_file in enumerate(self.label_file_list):
+            label_dict = {
+                'frame_id': index,
+            }
+            obj_list = self.get_label(index)
+            label_dict.update({
+                'name': np.array([obj.cls_type for obj in obj_list]),
+                'gt_boxes_lidar': np.concatenate([obj.box3d.reshape(1, 7) for obj in obj_list], axis=0)
+            })
+            self.annos.append(label_dict)
 
     @staticmethod
     def generate_prediction_dicts(batch_dict, pred_dicts, class_names, output_path=None):
@@ -90,7 +102,7 @@ class LamppostDataset(DatasetTemplate):
         return annos
 
     def evaluation(self, det_annos, class_names, **kwargs):
-        if 'annos' not in self.infos[0].keys():
+        if 'gt_boxes_lidar' not in self.annos[0].keys():
             return 'No ground-truth boxes for evaluation', {}
 
         def kitti_eval(eval_det_annos, eval_gt_annos):
@@ -114,7 +126,7 @@ class LamppostDataset(DatasetTemplate):
             return ap_result_str, ap_dict
 
         eval_det_annos = copy.deepcopy(det_annos)
-        eval_gt_annos = [copy.deepcopy(info['annos']) for info in self.infos]
+        eval_gt_annos = copy.deepcopy(self.annos)
 
         ap_result_str, ap_dict = kitti_eval(eval_det_annos, eval_gt_annos)
 
