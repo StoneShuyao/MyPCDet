@@ -85,6 +85,10 @@ def main():
     model.eval()
     with torch.no_grad():
         for idx, data_dict in enumerate(demo_dataset):
+
+            if (idx % 10):
+                continue
+
             logger.info(f'Visualized sample index: \t{idx + 1}')
             data_dict = demo_dataset.collate_batch([data_dict])
             load_data_to_gpu(data_dict)

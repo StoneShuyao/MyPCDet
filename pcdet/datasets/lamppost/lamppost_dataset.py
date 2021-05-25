@@ -28,6 +28,10 @@ class LamppostDataset(DatasetTemplate):
         self.root_split_path = self.root_path / ('training' if self.split != 'test' else 'testing')
         self.ext = ext
 
+        split_dir = self.root_path / 'ImageSets' / (self.split + '.txt')
+        self.sample_id_list = [x.strip() for x in open(split_dir).readlines()] if split_dir.exists() else None
+
+        '''
         pc_file_list = glob.glob(str(self.root_split_path / 'lidar' / f'*{self.ext}')) if self.root_path.is_dir() else [self.root_path]
         pc_file_list.sort()
         label_list = glob.glob(str(self.root_split_path / 'label' / f'*{self.ext}')) if self.root_path.is_dir() else [self.root_path]
@@ -35,21 +39,22 @@ class LamppostDataset(DatasetTemplate):
 
         self.sample_file_list = pc_file_list
         self.label_file_list = label_list
+        '''
 
         self.annos  = []
         self.get_annos()
 
     def get_label(self, idx):
-        label_file = self.label_file_list[idx]
+        label_file = self.root_split_path / 'label' / ('%s.txt' % idx)
         assert label_file.exists()
         return read_label.get_objects_from_label(label_file)
 
     def get_annos(self):
-        for index, label_file in enumerate(self.label_file_list):
+        for index, label_id in enumerate(self.sample_id_list):
             label_dict = {
-                'frame_id': index,
+                'frame_id': label_id,
             }
-            obj_list = self.get_label(index)
+            obj_list = self.get_label(label_id)
             label_dict.update({
                 'name': np.array([obj.cls_type for obj in obj_list]),
                 'gt_boxes_lidar': np.concatenate([obj.box3d.reshape(1, 7) for obj in obj_list], axis=0)
@@ -134,27 +139,24 @@ class LamppostDataset(DatasetTemplate):
 
     def __len__(self):
         if self._merge_all_iters_to_one_epoch:
-            return len(self.sample_file_list) * self.total_epochs
+            return len(self.sample_id_list) * self.total_epochs
 
-        return len(self.sample_file_list)
+        return len(self.sample_id_list)
 
     def __getitem__(self, index):
         if self._merge_all_iters_to_one_epoch:
-            index = index % len(self.sample_file_list)
+            index = index % len(self.sample_id_list)
 
-        if self.ext == '.bin':
-            points = np.fromfile(self.sample_file_list[index], dtype=np.float32).reshape(-1, 4)
-        elif self.ext == '.npy':
-            points = np.load(self.sample_file_list[index])
-        else:
-            raise NotImplementedError
+        sample_id = self.sample_id_list[index]
+        lidar_file = self.root_split_path / 'lidar' / ('%s.bin' % sample_id)
+        points = np.fromfile(str(lidar_file), dtype=np.float32).reshape(-1, 4)
 
         input_dict = {
             'points': points,
-            'frame_id': index,
+            'frame_id': sample_id,
         }
 
-        obj_list = self.get_label(index)
+        obj_list = self.get_label(sample_id)
         input_dict.update({
             'gt_names': np.array([obj.cls_type for obj in obj_list]),
             'gt_boxes': np.concatenate([obj.box3d.reshape(1, 7) for obj in obj_list], axis=0)
