@@ -1,6 +1,9 @@
 import argparse
 import glob
 from pathlib import Path
+import re
+import os
+import subprocess
 
 import mayavi.mlab as mlab
 import numpy as np
@@ -44,13 +47,48 @@ class LabelDataset(DatasetTemplate):
         else:
             raise NotImplementedError
 
+        sample_id = re.split(r'[/.]\s*', self.sample_file_list[index].strip())[-2]
+        # sample_id = self.sample_file_list[index]
+        # sample_id = self.sample_file_list[index].split('/')
+
         input_dict = {
             'points': points,
-            'frame_id': index,
+            'frame_id': sample_id,
         }
 
         data_dict = self.prepare_data(data_dict=input_dict)
         return data_dict
+
+
+def cls_type_to_name(cls_type):
+    type_to_name = {1: 'Car', 2: 'Pedestrian', 3: 'Cyclist'}
+    if cls_type not in type_to_name.keys():
+        return -1
+    return type_to_name[cls_type]
+
+
+def write_label_file(pred_dicts, label_file):
+    gt_types = pred_dicts[0]['pred_labels'].cpu().numpy()
+    gt_boxes = pred_dicts[0]['pred_boxes'].cpu().numpy()
+    scores = pred_dicts[0]['pred_scores'].cpu().numpy()
+    gt_names = [cls_type_to_name(type_id) for type_id in gt_types]
+    print("gt_boxes:", gt_boxes)
+    print("scores:", scores)
+    print("gt_names:", gt_names)
+
+    with open(label_file, 'w') as f:
+        for i in range(len(gt_names)):
+            if i:
+                f.write("\n%s %f %f %f %f %f %f %f %f"
+                        % (gt_names[i], gt_boxes[i][0], gt_boxes[i][1], gt_boxes[i][2],
+                           gt_boxes[i][3], gt_boxes[i][4], gt_boxes[i][5],
+                           gt_boxes[i][6], scores[i]))
+            else:
+                f.write("%s %f %f %f %f %f %f %f %f"
+                        % (gt_names[i], gt_boxes[i][0], gt_boxes[i][1], gt_boxes[i][2],
+                           gt_boxes[i][3], gt_boxes[i][4], gt_boxes[i][5],
+                           gt_boxes[i][6], scores[i]))
+    return
 
 
 def parse_config():
@@ -61,6 +99,8 @@ def parse_config():
                         help='specify the point cloud data file or directory')
     parser.add_argument('--ckpt', type=str, default=None, help='specify the pretrained model')
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
+    parser.add_argument('--label_path', type=str, default='data_label',
+                        help='specify the data label file or directory')
 
     args = parser.parse_args()
 
@@ -73,30 +113,53 @@ def main():
     args, cfg = parse_config()
     logger = common_utils.create_logger()
     logger.info('-----------------Quick Demo of OpenPCDet-------------------------')
-    demo_dataset = LabelDataset(
+    label_dataset = LabelDataset(
         dataset_cfg=cfg.DATA_CONFIG, class_names=cfg.CLASS_NAMES, training=False,
         root_path=Path(args.data_path), ext=args.ext, logger=logger
     )
-    logger.info(f'Total number of samples: \t{len(demo_dataset)}')
+    logger.info(f'Total number of samples: \t{len(label_dataset)}')
+    des_path = args.label_path
+    if os.path.exists(des_path):
+        pass
+    else:
+        os.makedirs(des_path)
 
-    model = build_network(model_cfg=cfg.MODEL, num_class=len(cfg.CLASS_NAMES), dataset=demo_dataset)
+    model = build_network(model_cfg=cfg.MODEL, num_class=len(cfg.CLASS_NAMES), dataset=label_dataset)
     model.load_params_from_file(filename=args.ckpt, logger=logger, to_cpu=True)
     model.cuda()
     model.eval()
     with torch.no_grad():
-        for idx, data_dict in enumerate(demo_dataset):
+        for idx, data_dict in enumerate(label_dataset):
             logger.info(f'Visualized sample index: \t{idx + 1}')
-            data_dict = demo_dataset.collate_batch([data_dict])
+
+            print(data_dict['frame_id'])
+            sample_id = data_dict['frame_id']
+
+            data_dict = label_dataset.collate_batch([data_dict])
+            # print(data_dict['frame_id'])
+
             load_data_to_gpu(data_dict)
             pred_dicts, _ = model.forward(data_dict)
 
-            print(pred_dicts)
-
+            # print(pred_dicts)
+            pcd_file = os.path.join(args.data_path, sample_id) + '.bin'
+            label_file = os.path.join(des_path, sample_id) + '.txt'
+            write_label_file(pred_dicts, label_file)
+            subprocess.call(["xdg-open", label_file])
             V.draw_scenes(
                 points=data_dict['points'][:, 1:], ref_boxes=pred_dicts[0]['pred_boxes'],
                 ref_scores=pred_dicts[0]['pred_scores'], ref_labels=pred_dicts[0]['pred_labels']
             )
             mlab.show(stop=False)
+            # subprocess.call(["xdg-open", label_file])
+
+            flag = input("Input '1' to save the label, or will delete the bin and label file: ")
+            if flag == '1':
+                continue
+            else:
+                os.remove(pcd_file)
+                os.remove(label_file)
+
 
     logger.info('Demo done.')
 

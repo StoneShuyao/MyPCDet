@@ -21,5 +21,5 @@ class Label(object):
         self.src = line
         self.cls_type = label[0]
         self.cls_id = cls_type_to_id(self.cls_type)
-        self.box3d = np.array((float(label[1]), float(label[2]), float(label[3]), float(label[4]), \
+        self.box3d = np.array((float(label[1]), float(label[2]), float(label[3]), float(label[4]),
                                float(label[5]), float(label[6]), float(label[7])), dtype=np.float32)

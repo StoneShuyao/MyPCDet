@@ -70,7 +70,7 @@ def boxes_to_corners_3d(boxes3d):
 
 
 def visualize_pts(pts, fig=None, bgcolor=(0, 0, 0), fgcolor=(1.0, 1.0, 1.0),
-                  show_intensity=False, size=(1000, 1000), draw_origin=True):
+                      show_intensity=False, size=(2000, 2000), draw_origin=True):
     if not isinstance(pts, np.ndarray):
         pts = pts.cpu().numpy()
     if fig is None:
