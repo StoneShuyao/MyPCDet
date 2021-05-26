@@ -72,9 +72,12 @@ def write_label_file(pred_dicts, label_file):
     gt_boxes = pred_dicts[0]['pred_boxes'].cpu().numpy()
     scores = pred_dicts[0]['pred_scores'].cpu().numpy()
     gt_names = [cls_type_to_name(type_id) for type_id in gt_types]
-    print("gt_boxes:", gt_boxes)
-    print("scores:", scores)
-    print("gt_names:", gt_names)
+    # print("gt_boxes:", gt_boxes)
+    # print("scores:", scores)
+    # print("gt_names:", gt_names)
+    flag = 0
+    if 'Pedestrian' in gt_names:
+        flag = 1
 
     with open(label_file, 'w') as f:
         for i in range(len(gt_names)):
@@ -88,7 +91,7 @@ def write_label_file(pred_dicts, label_file):
                         % (gt_names[i], gt_boxes[i][0], gt_boxes[i][1], gt_boxes[i][2],
                            gt_boxes[i][3], gt_boxes[i][4], gt_boxes[i][5],
                            gt_boxes[i][6], scores[i]))
-    return
+    return flag
 
 
 def parse_config():
@@ -132,7 +135,7 @@ def main():
         for idx, data_dict in enumerate(label_dataset):
             logger.info(f'Visualized sample index: \t{idx + 1}')
 
-            print(data_dict['frame_id'])
+            # print(data_dict['frame_id'])
             sample_id = data_dict['frame_id']
 
             data_dict = label_dataset.collate_batch([data_dict])
@@ -144,7 +147,13 @@ def main():
             # print(pred_dicts)
             pcd_file = os.path.join(args.data_path, sample_id) + '.bin'
             label_file = os.path.join(des_path, sample_id) + '.txt'
-            write_label_file(pred_dicts, label_file)
+            have_pedestrian = write_label_file(pred_dicts, label_file)
+
+            if not have_pedestrian:
+                os.remove(pcd_file)
+                os.remove(label_file)
+                continue
+
             subprocess.call(["xdg-open", label_file])
             V.draw_scenes(
                 points=data_dict['points'][:, 1:], ref_boxes=pred_dicts[0]['pred_boxes'],
@@ -159,7 +168,6 @@ def main():
             else:
                 os.remove(pcd_file)
                 os.remove(label_file)
-
 
     logger.info('Demo done.')
 
