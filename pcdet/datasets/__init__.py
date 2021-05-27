@@ -8,12 +8,14 @@ from .dataset import DatasetTemplate
 from .kitti.kitti_dataset import KittiDataset
 from .nuscenes.nuscenes_dataset import NuScenesDataset
 from .waymo.waymo_dataset import WaymoDataset
+from .lamppost.lamppost_dataset import LamppostDataset
 
 __all__ = {
     'DatasetTemplate': DatasetTemplate,
     'KittiDataset': KittiDataset,
     'NuScenesDataset': NuScenesDataset,
-    'WaymoDataset': WaymoDataset
+    'WaymoDataset': WaymoDataset,
+    'LamppostDataset': LamppostDataset
 }
 
 

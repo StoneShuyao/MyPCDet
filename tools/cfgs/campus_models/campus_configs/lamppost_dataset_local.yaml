@@ -1,5 +1,5 @@
 DATASET: 'LamppostDataset'
-DATA_PATH: '../data/lamppost'
+DATA_PATH: '/ssd/Data/Livox/try'
 
 POINT_CLOUD_RANGE: [0, -32, -2.5, 64, 32, 1.5]
 

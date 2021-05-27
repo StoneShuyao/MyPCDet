@@ -1,7 +1,8 @@
 CLASS_NAMES: ['Car', 'Pedestrian', 'Cyclist']
 
 DATA_CONFIG:
-    _BASE_CONFIG_: cfgs/dataset_configs/kitti_dataset.yaml
+    #_BASE_CONFIG_: cfgs/dataset_configs/kitti_dataset.yaml
+    _BASE_CONFIG_: cfgs/dataset_configs/kitti_dataset_range.yaml
     DATA_AUGMENTOR:
         DISABLE_AUG_LIST: ['placeholder']
         AUG_CONFIG_LIST:
@@ -177,7 +178,7 @@ MODEL:
                 MULTI_CLASSES_NMS: False
                 NMS_PRE_MAXSIZE: 1024
                 NMS_POST_MAXSIZE: 100
-                NMS_THRESH: 0.7
+                NMS_THRESH: 0.1
 
         ROI_GRID_POOL:
             GRID_SIZE: 6
@@ -214,7 +215,7 @@ MODEL:
 
     POST_PROCESSING:
         RECALL_THRESH_LIST: [0.3, 0.5, 0.7]
-        SCORE_THRESH: 0.7
+        SCORE_THRESH: 0.1
         OUTPUT_RAW_SCORE: False
 
         EVAL_METRIC: kitti

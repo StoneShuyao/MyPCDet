@@ -9,6 +9,13 @@ from .augmentor.data_augmentor import DataAugmentor
 from .processor.data_processor import DataProcessor
 from .processor.point_feature_encoder import PointFeatureEncoder
 
+is_ours = {
+    'DatasetTemplate': 0,
+    'KittiDataset': 0,
+    'NuScenesDataset': 0,
+    'WaymoDataset': 0,
+    'LamppostDataset': 1
+}
 
 class DatasetTemplate(torch_data.Dataset):
     def __init__(self, dataset_cfg=None, class_names=None, training=True, root_path=None, logger=None):
@@ -29,7 +36,7 @@ class DatasetTemplate(torch_data.Dataset):
         )
         self.data_augmentor = DataAugmentor(
             self.root_path, self.dataset_cfg.DATA_AUGMENTOR, self.class_names, logger=self.logger
-        ) if self.training else None
+        ) if self.training and not is_ours[self.dataset_cfg.DATASET] else None
         self.data_processor = DataProcessor(
             self.dataset_cfg.DATA_PROCESSOR, point_cloud_range=self.point_cloud_range, training=self.training
         )
@@ -114,7 +121,7 @@ class DatasetTemplate(torch_data.Dataset):
                 voxel_num_points: optional (num_voxels)
                 ...
         """
-        if self.training:
+        if self.training and not is_ours[self.dataset_cfg.DATASET]:
             assert 'gt_boxes' in data_dict, 'gt_boxes should be provided for training'
             gt_boxes_mask = np.array([n in self.class_names for n in data_dict['gt_names']], dtype=np.bool_)
 
