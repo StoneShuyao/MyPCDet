@@ -1,2 +1,5 @@
 5.27 labeling history data:
-python labeling.py --cfg_file cfgs/kitti_models/pv_rcnn_gpu.yaml --ckpt ckpt/checkpoint_epoch_80.pth --data_path /ssd/Data/Livox/lamppost_dataset/historydata/bin/ --label_path /ssd/Data/Livox/lamppost_dataset/historydata/label/ --final_path /ssd/Data/Livox/lamppost_dataset/historydata/final/
+
+lab computer: python labeling.py --cfg_file cfgs/kitti_models/pv_rcnn_gpu.yaml --ckpt ckpt/checkpoint_epoch_80.pth --data_path /ssd/Data/Livox/lamppost_dataset/historydata/bin/ --label_path /ssd/Data/Livox/lamppost_dataset/historydata/label/ --final_path /ssd/Data/Livox/lamppost_dataset/historydata/final/
+
+dorm computer: python labeling.py --cfg_file cfgs/kitti_models/pv_rcnn_gpu.yaml --ckpt ckpt/checkpoint_epoch_80.pth --data_path ../data/Livox/lamppost_dataset/historydata/bin/ --label_path ../data/Livox/lamppost_dataset/historydata/label/ --final_path ../data/Livox/lamppost_dataset/historydata/final/
