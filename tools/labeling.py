@@ -4,6 +4,7 @@ from pathlib import Path
 import re
 import os
 import subprocess
+import shutil
 
 import mayavi.mlab as mlab
 import numpy as np
@@ -104,6 +105,8 @@ def parse_config():
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
     parser.add_argument('--label_path', type=str, default='data_label',
                         help='specify the data label file or directory')
+    parser.add_argument('--final_path', type=str, default='final_data',
+                        help='specify the final data file or directory')
 
     args = parser.parse_args()
 
@@ -115,17 +118,23 @@ def parse_config():
 def main():
     args, cfg = parse_config()
     logger = common_utils.create_logger()
-    logger.info('-----------------Quick Demo of OpenPCDet-------------------------')
+    logger.info('-----------------Labeling of our Dataset by OpenPCDet-------------------------')
     label_dataset = LabelDataset(
         dataset_cfg=cfg.DATA_CONFIG, class_names=cfg.CLASS_NAMES, training=False,
         root_path=Path(args.data_path), ext=args.ext, logger=logger
     )
     logger.info(f'Total number of samples: \t{len(label_dataset)}')
-    des_path = args.label_path
-    if os.path.exists(des_path):
+    label_path = args.label_path
+    if os.path.exists(label_path):
         pass
     else:
-        os.makedirs(des_path)
+        os.makedirs(label_path)
+
+    final_path = args.final_path
+    if os.path.exists(final_path):
+        pass
+    else:
+        os.makedirs(final_path)
 
     model = build_network(model_cfg=cfg.MODEL, num_class=len(cfg.CLASS_NAMES), dataset=label_dataset)
     model.load_params_from_file(filename=args.ckpt, logger=logger, to_cpu=True)
@@ -146,7 +155,7 @@ def main():
 
             # print(pred_dicts)
             pcd_file = os.path.join(args.data_path, sample_id) + '.bin'
-            label_file = os.path.join(des_path, sample_id) + '.txt'
+            label_file = os.path.join(label_path, sample_id) + '.txt'
             have_pedestrian = write_label_file(pred_dicts, label_file)
 
             if not have_pedestrian:
@@ -164,12 +173,13 @@ def main():
 
             flag = input("Input '1' to save the label, or will delete the bin and label file: ")
             if flag == '1':
-                continue
+                shutil.copy(pcd_file, final_path)
+                os.remove(pcd_file)
             else:
                 os.remove(pcd_file)
                 os.remove(label_file)
 
-    logger.info('Demo done.')
+    logger.info('Label done.')
 
 
 if __name__ == '__main__':
