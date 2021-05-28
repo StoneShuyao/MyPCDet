@@ -77,13 +77,14 @@ def convert(pcdfolder, binfolder):
     num = len(os.listdir(des_path))
 
     for file in file_list: 
-        (filename,extension) = os.path.splitext(file)
+        (filename, extension) = os.path.splitext(file)
         pcd_file = os.path.join(ori_path, filename) + '.pcd'
         pl = process_pcd(pcd_file)
         pl = pl.reshape(-1, 4).astype(np.float32)
         pcd_file_new = os.path.join(des_path, "%06d" % num) + '.bin'
         pl.tofile(pcd_file_new)
         num += 1
-    
+
+
 if __name__ == "__main__":
-    fire.Fire() 
+    fire.Fire()
