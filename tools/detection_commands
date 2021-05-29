@@ -1,0 +1,2 @@
+05.29 try to train on history data:
+python train.py --cfg_file cfgs/campus_models/pv_rcnn_lamppost.yaml --pretrained_model ckpt/checkpoint_epoch_80.pth --batch_size 1 --workers 2 --epochs 15 --extra_tag '0529_historydata'

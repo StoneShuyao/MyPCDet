@@ -11,3 +11,5 @@ python detect_wrong_label.py detect_wrong /ssd/Data/Livox/lamppost_dataset/histo
 python add_new_data.py add_new_data /ssd/Data/Livox/lamppost_dataset/historydata/training/ /ssd/Data/Livox/lamppost_dataset/dataset/history_train/
 
 python add_new_data.py shuffle_data /ssd/Data/Livox/lamppost_dataset/dataset/history_train/
+
+python split_dataset.py split_dataset /ssd/Data/Livox/lamppost_dataset/dataset/training/ /ssd/Data/Livox/lamppost_dataset/dataset/ImageSets/ 0.8
