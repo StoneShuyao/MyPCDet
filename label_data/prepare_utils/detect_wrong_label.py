@@ -3,6 +3,14 @@ import fire
 
 
 def detect_wrong(label_path):
+    """
+    Detect label files with wrong format: blank file, blank lines, lines with wrong length
+    Args:
+        label_path: path of label files
+
+    Returns:
+
+    """
     file_list = os.listdir(label_path)
     file_list.sort()
     have_wrong_line = []

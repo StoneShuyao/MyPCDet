@@ -1,2 +1,5 @@
 05.29 try to train on history data:
 python train.py --cfg_file cfgs/campus_models/pv_rcnn_lamppost.yaml --pretrained_model ckpt/checkpoint_epoch_80.pth --batch_size 1 --workers 2 --epochs 15 --extra_tag '0529_historydata'
+
+05.30 train and test on gpu:
+python test_gpu.py --cfg_file cfgs/campus_models/pv_rcnn_lamppost_gpu.yaml --batch_size 3 --workers 4 --extra_tag '0529_30epochs_historydata' --ckpt_dir /mnt/ssd/shishuyao/detection/kitti_train/output/campus_models/pv_rcnn_lamppost_gpu/0529_30epochs_historydata/ckpt/ --eval_all

@@ -4,6 +4,15 @@ import random
 
 
 def write_idx_file(set_list, set_file):
+    """
+    Write the indexes into txt file
+    Args:
+        set_list: indexes list
+        set_file: dest file, train.txt or val.txt
+
+    Returns:
+
+    """
     with open(set_file, 'w') as f:
         for i, idx in enumerate(set_list):
             if i:
@@ -13,6 +22,18 @@ def write_idx_file(set_list, set_file):
 
 
 def split_dataset(data_path, image_sets, train_percentage):
+    """
+    Split a data set to train and val sets, write the index txt files and save
+    in ImageSets folder
+
+    Args:
+        data_path: dataset folder, should contain lidar and label folders
+        image_sets: dest folder, to save the train.txt and val.txt
+        train_percentage: the proportion of the training set in the whole data set, in [0,1]
+
+    Returns:
+
+    """
     pcd_dir = os.path.join(data_path, 'lidar/')
     label_dir = os.path.join(data_path, 'label/')
     pcd_list = os.listdir(pcd_dir)

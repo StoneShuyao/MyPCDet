@@ -5,6 +5,17 @@ import fire
 
 
 def add_new_data(data_path, new_path):
+    """
+    Add a set of newly collected data to the original/or a new dataset, the indexes
+    of the frame files are follow the original indexes and  add one by one.
+
+    Args:
+        data_path: the new collected data path
+        new_path: the dataset to be added
+
+    Returns:
+
+    """
     pcd_dir = os.path.join(data_path, 'lidar/')
     label_dir = os.path.join(data_path, 'label/')
     pcd_list = os.listdir(pcd_dir)
@@ -44,6 +55,16 @@ def add_new_data(data_path, new_path):
 
 
 def shuffle_data(data_path):
+    """
+    To shuffle the frames in the dataset to make the adjacent frame are not continue
+    in real world
+
+    Args:
+        data_path: The dataset to be shuffled, should contain both lidar and label
+
+    Returns:
+
+    """
     pcd_dir = os.path.join(data_path, 'lidar/')
     label_dir = os.path.join(data_path, 'label/')
     pcd_list = os.listdir(pcd_dir)

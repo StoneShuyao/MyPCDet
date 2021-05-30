@@ -33,6 +33,14 @@ def getAxisAngle(plane_model):
     return axis_angle
 
 def rotate2xy(pcd):
+    """
+    Rotate the road plane to XOY Plane
+    Args:
+        pcd: open3d pointcloud
+
+    Returns: rotated open3d pointcloud
+
+    """
     pcd_r = copy.deepcopy(pcd)
 
     # pcd_r.paint_uniform_color([1, 0.706, 0])
@@ -53,7 +61,17 @@ def rotate2xy(pcd):
     pcd_final = copy.deepcopy(pcd_r).translate((0, 0, plane_model1[3] / plane_model[2] - 1.7))
     return pcd_final
 
+
 def process_pcd(filepath):
+    """
+    First rotate the pcd to make the road plane parallel to XOY plane
+    Add a zero column to make pcd format from (x,y,z) to (x,y,z,i)
+    Args:
+        filepath: pcd file
+
+    Returns: processed point numpy array
+
+    """
     pcd = o3d.io.read_point_cloud(filepath)
     pcd_r = rotate2xy(pcd)
     lidar0 = np.asarray(pcd_r.points)
@@ -62,6 +80,15 @@ def process_pcd(filepath):
  
  
 def convert(pcdfolder, binfolder):
+    """
+    The main function of the pcd to bin convert
+    Args:
+        pcdfolder: pcd files path
+        binfolder: dest bin files path
+
+    Returns:
+
+    """
     num = 0
     current_path = os.getcwd()
     ori_path = os.path.join(current_path, pcdfolder)
