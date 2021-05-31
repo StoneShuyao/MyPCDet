@@ -8,6 +8,7 @@ import copy
 plane_threshold = 0.2
 segment_interations = 50
 
+
 def getAngle(plane_model):
     plane_norm = np.array(plane_model[0:3])
     xy_norm = np.array([0,0,1])
@@ -16,6 +17,7 @@ def getAngle(plane_model):
     cos_angle=plane_norm.dot(xy_norm)/(Lplane*Lxy)
     angle=np.arccos(cos_angle)
     return angle
+
 
 def getAxisAngle(plane_model):
     plane_norm = np.array(plane_model[0:3])
@@ -27,10 +29,11 @@ def getAxisAngle(plane_model):
 
     axis = np.cross(xy_norm, plane_norm)
     axis_norm = axis/np.linalg.norm(axis)
-    #print(axis_norm)
+    # print(axis_norm)
     axis_angle = -angle * axis_norm
-    #print(axis_angle)
+    # print(axis_angle)
     return axis_angle
+
 
 def rotate2xy(pcd):
     """
@@ -64,7 +67,6 @@ def rotate2xy(pcd):
 
 def process_pcd(filepath):
     """
-    First rotate the pcd to make the road plane parallel to XOY plane
     Add a zero column to make pcd format from (x,y,z) to (x,y,z,i)
     Args:
         filepath: pcd file
@@ -73,10 +75,44 @@ def process_pcd(filepath):
 
     """
     pcd = o3d.io.read_point_cloud(filepath)
-    pcd_r = rotate2xy(pcd)
-    lidar0 = np.asarray(pcd_r.points)
+    lidar0 = np.asarray(pcd.points)
     lidar = np.c_[lidar0, np.zeros(lidar0.shape[0])]
     return np.array(lidar)
+
+
+def rotate_pcd(pcdfolder, rotatedfolder):
+    """
+    Rotate the pcd to make the road plane parallel to XOY plane,
+    and make the viewpoint be 1.7m high
+    Args:
+        pcdfolder: pcd files
+        rotatedfolder: rotated pcd files path
+
+    Returns:
+
+    """
+    cur_path = os.getcwd()
+    ori_path = os.path.join(cur_path, pcdfolder)
+    file_list = os.listdir(ori_path)
+    file_list.sort()
+    des_path = os.path.join(cur_path, rotatedfolder)
+
+    if os.path.exists(des_path):
+        pass
+    else:
+        os.makedirs(des_path)
+
+    num = len(os.listdir(des_path))
+
+    for file in file_list:
+        (filename, extension) = os.path.splitext(file)
+        pcd_file = os.path.join(ori_path, filename) + '.pcd'
+        pcd_0 = o3d.io.read_point_cloud(pcd_file)
+        pcd_r = rotate2xy(pcd_0)
+        pcd_file_new = os.path.join(des_path, "%06d" % num) + '.pcd'
+        o3d.io.write_point_cloud(pcd_file_new, pcd_r)
+
+        num += 1
  
  
 def convert(pcdfolder, binfolder):
@@ -89,7 +125,6 @@ def convert(pcdfolder, binfolder):
     Returns:
 
     """
-    num = 0
     current_path = os.getcwd()
     ori_path = os.path.join(current_path, pcdfolder)
     file_list = os.listdir(ori_path)
