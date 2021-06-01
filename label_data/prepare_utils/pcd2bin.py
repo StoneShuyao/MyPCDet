@@ -1,9 +1,10 @@
 import os
 import numpy as np
-from numpy.core.numeric import zeros_like
 import fire
 import open3d as o3d
 import copy
+import pcl
+
 
 plane_threshold = 0.2
 segment_interations = 50
@@ -107,10 +108,15 @@ def rotate_pcd(pcdfolder, rotatedfolder):
     for file in file_list:
         (filename, extension) = os.path.splitext(file)
         pcd_file = os.path.join(ori_path, filename) + '.pcd'
+        pcd_4array = pcl.load_XYZI(pcd_file).to_array()[:, :4]
         pcd_0 = o3d.io.read_point_cloud(pcd_file)
         pcd_r = rotate2xy(pcd_0)
+        pcd_3array = np.array(pcd_r.points)
+        pcd_4array[:, :3] = pcd_3array
+        pcd_pcl = pcl.PointCloud_PointXYZI(pcd_4array)
         pcd_file_new = os.path.join(des_path, "%06d" % num) + '.pcd'
-        o3d.io.write_point_cloud(pcd_file_new, pcd_r)
+        # o3d.io.write_point_cloud(pcd_file_new, pcd_r)
+        pcl.save(pcd_pcl, pcd_file_new, binary=True)
 
         num += 1
  
@@ -141,7 +147,13 @@ def convert(pcdfolder, binfolder):
     for file in file_list: 
         (filename, extension) = os.path.splitext(file)
         pcd_file = os.path.join(ori_path, filename) + '.pcd'
-        pl = process_pcd(pcd_file)
+        # pl = process_pcd(pcd_file)
+        # pl = pl.reshape(-1, 4).astype(np.float32)
+        pl = pcl.load_XYZI(pcd_file).to_array()[:, :4]
+
+        intensity = pl[:, 3]
+        pl[:, 3] = intensity / 255    # normalize the intensity
+
         pl = pl.reshape(-1, 4).astype(np.float32)
         pcd_file_new = os.path.join(des_path, "%06d" % num) + '.bin'
         pl.tofile(pcd_file_new)

@@ -92,5 +92,30 @@ def shuffle_data(data_path):
     print("----Finished shuffle data-----")
 
 
+def filter_by_index(data_folder, index_folder, des_folder):
+    """
+    When change data to a new format but still want the same frames with original dataset
+    Args:
+        data_folder: data with new format
+        index_folder: original format data
+        des_folder: new data path
+
+    Returns:
+
+    """
+    data_dir = data_folder
+    idx_dir = index_folder
+    idx_list = os.listdir(idx_dir)
+    idx_list.sort()
+
+    des_path = des_folder
+    os.makedirs(des_path)
+
+    for num, idx in enumerate(idx_list):
+        data_file = os.path.join(data_dir, idx)
+        des_file = os.path.join(des_path, idx)
+        shutil.copy(data_file, des_file)
+
+
 if __name__ == "__main__":
     fire.Fire()
