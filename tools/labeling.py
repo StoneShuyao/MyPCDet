@@ -77,7 +77,11 @@ def write_label_file(pred_dicts, label_file):
     # print("scores:", scores)
     # print("gt_names:", gt_names)
     flag = 0
-    if 'Pedestrian' in gt_names:
+
+    # if 'Pedestrian' in gt_names:
+    #    flag = 1
+
+    if gt_names.count('Pedestrian')>1 or gt_names.count('Car')>2 or gt_names.count('Cyclist')>0:
         flag = 1
 
     with open(label_file, 'w') as f:
@@ -142,6 +146,10 @@ def main():
     model.eval()
     with torch.no_grad():
         for idx, data_dict in enumerate(label_dataset):
+
+            if idx % 2:
+                continue
+
             logger.info(f'Visualized sample index: \t{idx + 1}')
 
             # print(data_dict['frame_id'])
