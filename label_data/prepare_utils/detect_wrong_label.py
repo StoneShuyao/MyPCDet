@@ -18,7 +18,7 @@ def detect_wrong(label_path):
     zero_lines = []
 
     for idx, file in enumerate(file_list):
-        print("Checking %d file", idx)
+        print("Checking %d file" % idx)
         with open(str(os.path.join(label_path, file)), 'r') as f:
             lines = f.readlines()
         if len(lines) == 0:

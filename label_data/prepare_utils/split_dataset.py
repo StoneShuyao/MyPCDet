@@ -59,7 +59,9 @@ def split_dataset(data_path, image_sets, train_percentage):
     train_num = round(frame_num * train_percentage)
     test_num = frame_num - train_num
     train_list = idx_list[:train_num]
+
     test_list = idx_list[train_num: frame_num]
+
     train_list.sort()
     test_list.sort()
     print('Train frames number: %d' % len(train_list))
