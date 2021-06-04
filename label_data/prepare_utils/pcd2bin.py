@@ -121,17 +121,18 @@ def rotate_pcd(pcdfolder, rotatedfolder):
         num += 1
  
  
-def convert(pcdfolder, binfolder):
+def convert(pcdfolder, binfolder, rootpath='./'):
     """
     The main function of the pcd to bin convert
     Args:
         pcdfolder: pcd files path
         binfolder: dest bin files path
+        rootpath:
 
     Returns:
 
     """
-    current_path = os.getcwd()
+    current_path = rootpath
     ori_path = os.path.join(current_path, pcdfolder)
     file_list = os.listdir(ori_path)
     file_list.sort()
@@ -158,6 +159,32 @@ def convert(pcdfolder, binfolder):
         pcd_file_new = os.path.join(des_path, "%06d" % num) + '.bin'
         pl.tofile(pcd_file_new)
         num += 1
+
+
+def convert_all(pcdfolder, binfolder):
+    """
+    Batch convert pcd in folders into bin
+    Args:
+        pcdfolder: folder contains pcd folders
+        binfolder: bin folder
+
+    Returns:
+
+    """
+    current_path = os.getcwd()
+    ori_path = os.path.join(current_path, pcdfolder)
+    folder_list = os.listdir(ori_path)
+    folder_list.sort()
+    des_path = os.path.join(current_path, binfolder)
+
+    if os.path.exists(des_path):
+        pass
+    else:
+        os.makedirs(des_path)
+
+    for folder in folder_list:
+        convert(folder, binfolder, rootpath=pcdfolder)
+        print('Converting %s to bin' %folder)
 
 
 if __name__ == "__main__":
