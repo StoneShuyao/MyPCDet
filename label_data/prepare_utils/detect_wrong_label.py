@@ -24,7 +24,7 @@ def detect_wrong(label_path):
         if len(lines) == 0:
             zero_lines.append(file)
             continue
-        elif len(lines) > 6:
+        elif len(lines) > 9:
             too_much_line.append(file)
             continue
         else:
