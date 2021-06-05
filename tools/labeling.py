@@ -61,6 +61,12 @@ class LabelDataset(DatasetTemplate):
         return data_dict
 
 
+def del_tensor_ele(arr, index):
+    arr1 = arr[0:index]
+    arr2 = arr[index+1:]
+    return torch.cat((arr1, arr2), dim=0)
+
+
 def cls_type_to_name(cls_type):
     type_to_name = {1: 'Car', 2: 'Pedestrian', 3: 'Cyclist'}
     if cls_type not in type_to_name.keys():
@@ -81,7 +87,32 @@ def write_label_file(pred_dicts, label_file):
     # if 'Pedestrian' in gt_names:
     #    flag = 1
 
-    if gt_names.count('Pedestrian')>1 or gt_names.count('Car')>2 or gt_names.count('Cyclist')>0:
+    if len(gt_types) == 0:
+        print("No object detected!")
+    else:
+        current_idx = 0
+        for idx in range(len(gt_types)):
+            if gt_types[idx] == 1 and scores[idx] < 0.5:
+                del_flag = 1
+            elif gt_types[idx] == 2 and scores[idx] < 0.4:
+                del_flag = 1
+            elif gt_types[idx] == 3 and scores[idx] < 0.3:
+                del_flag = 1
+            else:
+                del_flag = 0
+
+            if del_flag:
+                pred_dicts[0]['pred_labels'] = del_tensor_ele(pred_dicts[0]['pred_labels'], current_idx)
+                pred_dicts[0]['pred_boxes'] = del_tensor_ele(pred_dicts[0]['pred_boxes'], current_idx)
+                pred_dicts[0]['pred_scores'] = del_tensor_ele(pred_dicts[0]['pred_scores'], current_idx)
+            else:
+                current_idx += 1
+    gt_types = pred_dicts[0]['pred_labels'].cpu().numpy()
+    gt_boxes = pred_dicts[0]['pred_boxes'].cpu().numpy()
+    scores = pred_dicts[0]['pred_scores'].cpu().numpy()
+    gt_names = [cls_type_to_name(type_id) for type_id in gt_types]
+
+    if gt_names.count('Pedestrian')>1 or gt_names.count('Car')>3 or gt_names.count('Cyclist')>1:
         flag = 1
 
     with open(label_file, 'w') as f:
@@ -150,8 +181,8 @@ def main():
             if idx < args.start_from:
                 continue
 
-            if idx % 2:
-                continue
+            # if idx % 2:
+            #    continue
 
             logger.info(f'Visualized sample index: \t{idx + 1}')
 
