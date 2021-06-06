@@ -13,9 +13,9 @@ segment_interations = 50
 def getAngle(plane_model):
     plane_norm = np.array(plane_model[0:3])
     xy_norm = np.array([0,0,1])
-    Lplane=np.sqrt(plane_norm.dot(plane_norm))
-    Lxy=np.sqrt(xy_norm.dot(xy_norm))
-    cos_angle=plane_norm.dot(xy_norm)/(Lplane*Lxy)
+    Lplane = np.sqrt(plane_norm.dot(plane_norm))
+    Lxy = np.sqrt(xy_norm.dot(xy_norm))
+    cos_angle = plane_norm.dot(xy_norm)/(Lplane*Lxy)
     angle=np.arccos(cos_angle)
     return angle
 
@@ -47,8 +47,16 @@ def rotate2xy(pcd):
     """
     pcd_r = copy.deepcopy(pcd)
 
+    minbound = np.array([0, -9, -2.5])
+    maxbound = np.array([30, 9, -1])
+    interest_area_xy = o3d.geometry.AxisAlignedBoundingBox(min_bound=minbound, max_bound=maxbound)  # open3d.geometry.AxisAlignedBoundingBox
+    interest_area = o3d.geometry.OrientedBoundingBox.create_from_axis_aligned_bounding_box(interest_area_xy)  # open3d.geometry.OrientedBoundingBox
+    pcd1 = pcd.crop(interest_area)
+    if len(pcd1.points) < 3:
+        return pcd_r
+
     # pcd_r.paint_uniform_color([1, 0.706, 0])
-    plane_model, inliers = pcd.segment_plane(distance_threshold=plane_threshold, ransac_n=3,
+    plane_model, inliers = pcd1.segment_plane(distance_threshold=plane_threshold, ransac_n=3,
                                              num_iterations=segment_interations)
     rotate_angle = getAngle(plane_model)
     axis_angle = getAxisAngle(plane_model)
@@ -57,12 +65,10 @@ def rotate2xy(pcd):
     R1 = pcd.get_rotation_matrix_from_axis_angle(axis_angle)
 
     pcd_r.rotate(R1, center=(0, 0, 0))
-    # R2 = mesh.get_rotation_matrix_from_xyz((0, 0, 2*np.pi/11))
-    # mesh_r.rotate(R2, center=(0, 0, 0))
-    plane_model1, inliers1 = pcd_r.segment_plane(distance_threshold=plane_threshold, ransac_n=3,
-                                                 num_iterations=segment_interations)
-    # print(plane_model1)
-    pcd_final = copy.deepcopy(pcd_r).translate((0, 0, plane_model1[3] / plane_model1[2] - 1.7))
+    pcd_final = copy.deepcopy(pcd_r)
+    #pcd_r.paint_uniform_color([1, 0, 0])
+    #o3d.visualization.draw_geometries([pcd,pcd_r])
+
     return pcd_final
 
 
@@ -88,7 +94,6 @@ def rotate_pcd(pcdfolder, rotatedfolder, rootpath='./'):
     Args:
         pcdfolder: pcd files
         rotatedfolder: rotated pcd files path
-        rootpath:
 
     Returns:
 
@@ -186,7 +191,7 @@ def rotate_all(pcdfolder, rotate_folder):
     for folder in folder_list:
         des_folder = os.path.join(rotate_folder, folder)
         rotate_pcd(folder, des_folder, rootpath=pcdfolder)
-        print('Converting %s to bin' % folder)
+        print('rotating %s' % folder)
 
 
 def convert_all(pcdfolder, binfolder):
