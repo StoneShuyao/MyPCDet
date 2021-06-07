@@ -47,7 +47,7 @@ def rotate2xy(pcd):
     """
     pcd_r = copy.deepcopy(pcd)
 
-    minbound = np.array([0, -9, -2.5])
+    minbound = np.array([0, -9, -3])
     maxbound = np.array([30, 9, -1])
     interest_area_xy = o3d.geometry.AxisAlignedBoundingBox(min_bound=minbound, max_bound=maxbound)  # open3d.geometry.AxisAlignedBoundingBox
     interest_area = o3d.geometry.OrientedBoundingBox.create_from_axis_aligned_bounding_box(interest_area_xy)  # open3d.geometry.OrientedBoundingBox
@@ -65,7 +65,14 @@ def rotate2xy(pcd):
     R1 = pcd.get_rotation_matrix_from_axis_angle(axis_angle)
 
     pcd_r.rotate(R1, center=(0, 0, 0))
-    pcd_final = copy.deepcopy(pcd_r)
+
+    pcd2 = pcd_r.crop(interest_area)
+    if len(pcd2.points) < 3:
+        return pcd_r
+
+    plane_model1, inliers1 = pcd2.segment_plane(distance_threshold=plane_threshold, ransac_n=3,
+                                                 num_iterations=segment_interations)
+    pcd_final = copy.deepcopy(pcd_r).translate((0, 0, plane_model1[3] / plane_model1[2] - 1.7))
     #pcd_r.paint_uniform_color([1, 0, 0])
     #o3d.visualization.draw_geometries([pcd,pcd_r])
 

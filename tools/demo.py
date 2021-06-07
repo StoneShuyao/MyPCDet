@@ -86,7 +86,7 @@ def main():
     with torch.no_grad():
         for idx, data_dict in enumerate(demo_dataset):
 
-            if ((idx+1) % 10):
+            if ((idx+1) % 20):
                 continue
 
             logger.info(f'Visualized sample index: \t{idx + 1}')

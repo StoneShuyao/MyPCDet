@@ -92,11 +92,11 @@ def write_label_file(pred_dicts, label_file):
     else:
         current_idx = 0
         for idx in range(len(gt_types)):
-            if gt_types[idx] == 1 and scores[idx] < 0.5:
+            if gt_types[idx] == 1 and scores[idx] < 0.3:
                 del_flag = 1
-            elif gt_types[idx] == 2 and scores[idx] < 0.4:
+            elif gt_types[idx] == 2 and scores[idx] < 0.2:
                 del_flag = 1
-            elif gt_types[idx] == 3 and scores[idx] < 0.3:
+            elif gt_types[idx] == 3 and scores[idx] < 0.2:
                 del_flag = 1
             else:
                 del_flag = 0
@@ -112,7 +112,7 @@ def write_label_file(pred_dicts, label_file):
     scores = pred_dicts[0]['pred_scores'].cpu().numpy()
     gt_names = [cls_type_to_name(type_id) for type_id in gt_types]
 
-    if gt_names.count('Pedestrian')>1 or gt_names.count('Car')>3 or gt_names.count('Cyclist')>1:
+    if gt_names.count('Pedestrian')>0 or gt_names.count('Car')>1 or gt_names.count('Cyclist')>0:
         flag = 1
 
     with open(label_file, 'w') as f:
@@ -198,9 +198,9 @@ def main():
             # print(pred_dicts)
             pcd_file = os.path.join(args.data_path, sample_id) + '.bin'
             label_file = os.path.join(label_path, sample_id) + '.txt'
-            have_pedestrian = write_label_file(pred_dicts, label_file)
+            ignore_flag = write_label_file(pred_dicts, label_file)
 
-            if not have_pedestrian:
+            if not ignore_flag:
                 os.remove(pcd_file)
                 os.remove(label_file)
                 continue
