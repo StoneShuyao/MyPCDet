@@ -186,7 +186,7 @@ def rotate_all(pcdfolder, rotate_folder):
     for folder in folder_list:
         des_folder = os.path.join(rotate_folder, folder)
         rotate_pcd(folder, des_folder, rootpath=pcdfolder)
-        print('Converting %s to bin' % folder)
+        print('rotating %s' % folder)
 
 
 def convert_all(pcdfolder, binfolder):
