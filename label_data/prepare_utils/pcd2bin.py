@@ -7,7 +7,7 @@ import pcl
 
 
 plane_threshold = 0.2
-segment_interations = 50
+segment_interations = 150
 
 
 def getAngle(plane_model):
@@ -52,6 +52,8 @@ def rotate2xy(pcd):
                                              num_iterations=segment_interations)
     rotate_angle = getAngle(plane_model)
     axis_angle = getAxisAngle(plane_model)
+
+    # print(plane_model[3] / plane_model[2])
 
     # R1 = pcd.get_rotation_matrix_from_xyz((0, rotate_angle, 0))
     R1 = pcd.get_rotation_matrix_from_axis_angle(axis_angle)
