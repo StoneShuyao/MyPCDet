@@ -6,7 +6,7 @@ import copy
 import pcl
 
 
-plane_threshold = 0.2
+plane_threshold = 0.25
 segment_interations = 150
 
 
@@ -47,8 +47,8 @@ def rotate2xy(pcd):
     """
     pcd_r = copy.deepcopy(pcd)
 
-    minbound = np.array([0, -1, -2])
-    maxbound = np.array([30, 5, 2])
+    minbound = np.array([0, -2.5, -2])
+    maxbound = np.array([20, -0.5, -0.5])
     interest_area_xy = o3d.geometry.AxisAlignedBoundingBox(min_bound=minbound, max_bound=maxbound)  # open3d.geometry.AxisAlignedBoundingBox
     interest_area = o3d.geometry.OrientedBoundingBox.create_from_axis_aligned_bounding_box(interest_area_xy)  # open3d.geometry.OrientedBoundingBox
     pcd1 = pcd.crop(interest_area)
