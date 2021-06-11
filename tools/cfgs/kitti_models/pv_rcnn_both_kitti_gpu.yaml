@@ -2,7 +2,7 @@ CLASS_NAMES: ['Car', 'Pedestrian', 'Cyclist']
 
 DATA_CONFIG:
     #_BASE_CONFIG_: cfgs/dataset_configs/kitti_dataset.yaml
-    _BASE_CONFIG_: cfgs/campus_models/campus_configs/both_dataset_gpu.yaml
+    _BASE_CONFIG_: cfgs/dataset_configs/kitti_both_dataset_gpu.yaml
     DATA_AUGMENTOR:
         DISABLE_AUG_LIST: ['placeholder']
         AUG_CONFIG_LIST:
@@ -230,7 +230,7 @@ MODEL:
 
 
 OPTIMIZATION:
-    BATCH_SIZE_PER_GPU: 2
+    BATCH_SIZE_PER_GPU: 3
     NUM_EPOCHS: 80
 
     OPTIMIZER: adam_onecycle
