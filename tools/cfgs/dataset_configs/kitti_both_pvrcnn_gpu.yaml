@@ -1,7 +1,7 @@
 DATASET: 'KittiDataset'
 DATA_PATH: '/mnt/ssd/shishuyao/detection/kitti_train/data'
 
-POINT_CLOUD_RANGE: [-30.72, -32, -3, 61.44, 32, 1]
+POINT_CLOUD_RANGE: [-32, -32, -3, 64, 32, 1]
 
 DATA_SPLIT: {
     'train': train,
