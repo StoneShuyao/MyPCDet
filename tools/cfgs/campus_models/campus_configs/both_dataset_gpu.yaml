@@ -1,7 +1,7 @@
 DATASET: 'LamppostDataset'
 DATA_PATH: '/mnt/ssd/shishuyao/detection/both_train/dataset'
 
-POINT_CLOUD_RANGE: [-61.44, -51.2, -2.5, 61.44, 51.2, 1.5]
+POINT_CLOUD_RANGE: [-30.72, -32, -3, 61.44, 32, 1]
 
 DATA_SPLIT: {
     'train': train,
