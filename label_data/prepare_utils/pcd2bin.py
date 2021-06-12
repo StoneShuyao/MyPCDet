@@ -4,6 +4,7 @@ import fire
 import open3d as o3d
 import copy
 import pcl
+import shutil
 
 
 plane_threshold = 0.2
@@ -164,12 +165,75 @@ def convert(pcdfolder, binfolder, rootpath='./'):
         num += 1
 
 
+def convert_with_matrix(pcdfolder, matrix_folder, binfolder, matrix_dir, rootpath='./'):
+    """
+    The main function of the pcd to bin convert
+    Args:
+        pcdfolder: pcd files path
+        matrix_folder: transform matrix folder
+        binfolder: dest bin files path
+        matrix_dir: folder of matrix one by one
+        rootpath:
+
+    Returns:
+
+    """
+    current_path = rootpath
+    ori_path = os.path.join(current_path, pcdfolder)
+    file_list = os.listdir(ori_path)
+    file_list.sort()
+    des_path = os.path.join(current_path, binfolder)
+
+    matrix_file_name = pcdfolder + '.txt'
+
+    matrix_path = os.path.join(current_path, matrix_folder)
+    matrix_list = os.listdir(matrix_path)
+    matrix_list.sort()
+    matrix_des_path = os.path.join(current_path, matrix_dir)
+
+    if matrix_file_name not in matrix_list:
+        print('Error! %s not in matrix list' % matrix_file_name)
+        return
+    else:
+        matrix_to_copy = os.path.join(matrix_path, matrix_file_name)
+
+    if os.path.exists(des_path):
+        pass
+    else:
+        os.makedirs(des_path)
+
+    if os.path.exists(matrix_des_path):
+        pass
+    else:
+        os.makedirs(matrix_des_path)
+
+    num = len(os.listdir(des_path))
+
+    for file in file_list:
+        (filename, extension) = os.path.splitext(file)
+        pcd_file = os.path.join(ori_path, filename) + '.pcd'
+        # pl = process_pcd(pcd_file)
+        # pl = pl.reshape(-1, 4).astype(np.float32)
+        pl = pcl.load_XYZI(pcd_file).to_array()[:, :4]
+
+        intensity = pl[:, 3]
+        pl[:, 3] = intensity / 255    # normalize the intensity
+
+        pl = pl.reshape(-1, 4).astype(np.float32)
+        pcd_file_new = os.path.join(des_path, "%06d" % num) + '.bin'
+        pl.tofile(pcd_file_new)
+
+        matrix_des_file = os.path.join(matrix_des_path, "%06d" % num) + '.txt'
+        shutil.copy(matrix_to_copy, matrix_des_file)
+        num += 1
+
+
 def rotate_all(pcdfolder, rotate_folder):
     """
     Batch rotate pcd in folders
     Args:
         pcdfolder: folder contains pcd folders
-        rotatefolder: bin folder
+        rotate_folder: bin folder
 
     Returns:
 
@@ -215,6 +279,34 @@ def convert_all(pcdfolder, binfolder):
     for folder in folder_list:
         convert(folder, binfolder, rootpath=pcdfolder)
         print('Converting %s to bin' %folder)
+
+
+def convert_all_with_matrix(pcdfolder, matrix_folder, binfolder, matrix_dir):
+    """
+    Batch convert pcd in folders into bin
+    Args:
+        pcdfolder: folder contains pcd folders
+        matrix_folder: folder contains matrix
+        binfolder: bin folder
+        matrix_dir: matrix one by one
+
+    Returns:
+
+    """
+    current_path = os.getcwd()
+    ori_path = os.path.join(current_path, pcdfolder)
+    folder_list = os.listdir(ori_path)
+    folder_list.sort()
+    des_path = os.path.join(current_path, binfolder)
+
+    if os.path.exists(des_path):
+        pass
+    else:
+        os.makedirs(des_path)
+
+    for folder in folder_list:
+        convert_with_matrix(folder, matrix_folder, binfolder, matrix_dir, rootpath=pcdfolder)
+        print('Converting %s to bin' % folder)
 
 
 if __name__ == "__main__":
