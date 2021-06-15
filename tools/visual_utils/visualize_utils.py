@@ -131,7 +131,7 @@ def draw_grid(x1, y1, x2, y2, fig, tube_radius=None, color=(0.5, 0.5, 0.5)):
     return fig
 
 
-def draw_multi_grid_range(fig, grid_size=20, bv_range=(-60, -60, 60, 60)):
+def draw_multi_grid_range(fig, grid_size=10, bv_range=(-60, -60, 60, 60)):
     for x in range(bv_range[0], bv_range[2], grid_size):
         for y in range(bv_range[1], bv_range[3], grid_size):
             fig = draw_grid(x, y, x + grid_size, y + grid_size, fig)
@@ -152,7 +152,7 @@ def draw_scenes(points, gt_boxes=None, ref_boxes=None, ref_scores=None, ref_labe
         ref_labels = ref_labels.cpu().numpy()
 
     fig = visualize_pts(points)
-    fig = draw_multi_grid_range(fig, bv_range=(0, -40, 80, 40))
+    fig = draw_multi_grid_range(fig, bv_range=(-40, -40, 80, 40))
     if gt_boxes is not None:
         corners3d = boxes_to_corners_3d(gt_boxes)
         fig = draw_corners3d(corners3d, fig=fig, color=(0, 0, 1), max_num=100)
@@ -167,7 +167,8 @@ def draw_scenes(points, gt_boxes=None, ref_boxes=None, ref_scores=None, ref_labe
                 mask = (ref_labels == k)
                 fig = draw_corners3d(ref_corners3d[mask], fig=fig, color=cur_color, cls=ref_scores[mask], max_num=100)
     #mlab.view(azimuth=-179, elevation=54.0, distance=104.0, roll=90.0)
-    mlab.view(azimuth=-179, elevation=54.0, distance=120.0, roll=90.0)
+    #mlab.move(forward=-200)
+    mlab.view(azimuth=-179, elevation=54.0, distance=200.0, roll=90.0)
     return fig
 
 

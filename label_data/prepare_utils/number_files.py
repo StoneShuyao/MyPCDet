@@ -60,5 +60,65 @@ def number_all(total_folder, result_folder):
     print('Done: number all files')
 
 
+def number_dataset(ori_path, des_path):
+    root_path = ori_path
+    root_calib = os.path.join(root_path, 'calib')
+    calib_list = os.listdir(root_calib)
+    calib_list.sort()
+    root_car = os.path.join(root_path, 'car_bin')
+    car_list = os.listdir(root_car)
+    car_list.sort()
+    root_lamppost = os.path.join(root_path, 'lamppost_bin')
+    lamppost_list = os.listdir(root_lamppost)
+    lamppost_list.sort()
+    root_joint = os.path.join(root_path, 'joint_bin')
+    joint_list = os.listdir(root_joint)
+    joint_list.sort()
+
+    if os.path.exists(des_path):
+        print('Dest path already exists!')
+        return
+    else:
+        os.makedirs(des_path)
+        des_calib = os.path.join(des_path, 'calib')
+        os.makedirs(des_calib)
+        des_car = os.path.join(des_path, 'car_bin')
+        os.makedirs(des_car)
+        des_lamppost = os.path.join(des_path, 'lamppost_bin')
+        os.makedirs(des_lamppost)
+        des_joint = os.path.join(des_path, 'joint_bin')
+        os.makedirs(des_joint)
+
+    for idx, sample_name in enumerate(calib_list):
+        sample_id = sample_name.split('.')[0]
+        if car_list[idx].split('.')[0] != sample_id:
+            print('Sample ID %s does not match in Car list!')
+            return
+        elif lamppost_list[idx].split('.')[0] != sample_id:
+            print('Sample ID %s does not match in Lamppost list!')
+            return
+        elif joint_list[idx].split('.')[0] != sample_id:
+            print('Sample ID %s does not match in Joint list!')
+            return
+        else:
+            calib_file0 = os.path.join(root_calib, calib_list[idx])
+            car_file0 = os.path.join(root_car, car_list[idx])
+            lamppost_file0 = os.path.join(root_lamppost, lamppost_list[idx])
+            joint_file0 = os.path.join(root_joint, joint_list[idx])
+
+            calib_file = os.path.join(des_calib, '%06d' % idx) + '.txt'
+            car_file = os.path.join(des_car, '%06d' % idx) + '.bin'
+            lamppost_file = os.path.join(des_lamppost, '%06d' % idx) + '.bin'
+            joint_file = os.path.join(des_joint, '%06d' % idx) + '.bin'
+
+            shutil.copy(calib_file0, calib_file)
+            shutil.copy(car_file0, car_file)
+            shutil.copy(lamppost_file0, lamppost_file)
+            shutil.copy(joint_file0, joint_file)
+
+    print('Finished number dataset %s' % ori_path)
+    return
+
+
 if __name__ == "__main__":
     fire.Fire()

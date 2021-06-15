@@ -138,7 +138,7 @@ def parse_config():
                         help='specify the point cloud data file or directory')
     parser.add_argument('--ckpt', type=str, default=None, help='specify the pretrained model')
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
-    parser.add_argument('--start_from', type=int, default=0, help='specify the start idx of your point cloud data file')
+    parser.add_argument('--start_from', type=str, default='000000', help='specify the start idx of your point cloud data file')
     parser.add_argument('--label_path', type=str, default='data_label',
                         help='specify the data label file or directory')
     parser.add_argument('--final_path', type=str, default='final_data',
@@ -178,13 +178,14 @@ def main():
     model.eval()
     with torch.no_grad():
         for idx, data_dict in enumerate(label_dataset):
-            if idx < args.start_from:
+            sample_id = data_dict['frame_id']
+            if int(sample_id) < int(args.start_from):
                 continue
 
             # if idx % 2:
             #    continue
 
-            logger.info(f'Visualized sample index: \t{idx + 1}')
+            logger.info(f'Visualized sample index: \t{sample_id}')
 
             # print(data_dict['frame_id'])
             sample_id = data_dict['frame_id']

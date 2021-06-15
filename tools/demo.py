@@ -61,6 +61,8 @@ def parse_config():
                         help='specify the point cloud data file or directory')
     parser.add_argument('--ckpt', type=str, default=None, help='specify the pretrained model')
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
+    parser.add_argument('--start_from', type=str, default='000000',
+                        help='specify the start idx of your point cloud data file')
 
     args = parser.parse_args()
 
@@ -86,13 +88,14 @@ def main():
     with torch.no_grad():
         for idx, data_dict in enumerate(demo_dataset):
 
-            #if idx < 2020:
-                #continue
-
-            if ((idx+1) % 10):
+            sample_id = data_dict['frame_id']
+            if int(sample_id) < int(args.start_from):
                 continue
 
-            logger.info(f'Visualized sample index: \t{idx + 1}')
+            # if ((idx+1) % 5):
+            #   continue
+
+            logger.info(f'Visualized sample index: \t{int(sample_id)}')
             data_dict = demo_dataset.collate_batch([data_dict])
             load_data_to_gpu(data_dict)
             pred_dicts, _ = model.forward(data_dict)
