@@ -24,9 +24,15 @@ def detect_wrong(label_path):
         if len(lines) == 0:
             zero_lines.append(file)
             continue
-        elif len(lines) > 9:
+        elif len(lines) > 13:
             too_much_line.append(file)
-            continue
+            for line in lines:
+                label = line.strip().split(' ')
+                if len(label) != 9:
+                    have_wrong_line.append(file)
+                    break
+                else:
+                    continue
         else:
             for line in lines:
                 label = line.strip().split(' ')
