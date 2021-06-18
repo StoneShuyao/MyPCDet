@@ -92,8 +92,8 @@ def main():
             if int(sample_id) < int(args.start_from):
                 continue
 
-            # if ((idx+1) % 5):
-            #   continue
+            if (idx+1) % 5:
+                continue
 
             logger.info(f'Visualized sample index: \t{int(sample_id)}')
             data_dict = demo_dataset.collate_batch([data_dict])
