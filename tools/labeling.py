@@ -182,8 +182,8 @@ def main():
             if int(sample_id) < int(args.start_from):
                 continue
 
-            # if idx % 2:
-            #    continue
+            if int(sample_id) % 2:
+                continue
 
             logger.info(f'Visualized sample index: \t{sample_id}')
 

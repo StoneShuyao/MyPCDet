@@ -15,7 +15,7 @@ from visual_utils import visualize_utils as V
 
 # The threshold of the score of objects
 thres_car = 0.5
-thres_pedestrian = 0.2
+thres_pedestrian = 0.3
 thres_cyclist = 0.3
 
 class DetectionDataset(DatasetTemplate):

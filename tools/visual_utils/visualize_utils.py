@@ -152,7 +152,7 @@ def draw_scenes(points, gt_boxes=None, ref_boxes=None, ref_scores=None, ref_labe
         ref_labels = ref_labels.cpu().numpy()
 
     fig = visualize_pts(points)
-    fig = draw_multi_grid_range(fig, bv_range=(-40, -40, 80, 40))
+    fig = draw_multi_grid_range(fig, bv_range=(-30, -30, 50, 30))
     if gt_boxes is not None:
         corners3d = boxes_to_corners_3d(gt_boxes)
         fig = draw_corners3d(corners3d, fig=fig, color=(0, 0, 1), max_num=100)

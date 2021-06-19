@@ -92,7 +92,7 @@ def main():
             if int(sample_id) < int(args.start_from):
                 continue
 
-            if (idx+1) % 5:
+            if int(sample_id) % 5:
                 continue
 
             logger.info(f'Visualized sample index: \t{int(sample_id)}')
