@@ -1,7 +1,7 @@
 DATASET: 'LamppostDataset'
 DATA_PATH: '/home/shuyao/Documents/co_detection/Data/Livox/0603_data/both/new_detection_train/joint_train/dataset'
 
-POINT_CLOUD_RANGE: [0, -32, -2.5, 64, 32, 1.5]
+POINT_CLOUD_RANGE: [-30.72, -32, -3, 61.44, 32, 1]
 
 DATA_SPLIT: {
     'train': train,
