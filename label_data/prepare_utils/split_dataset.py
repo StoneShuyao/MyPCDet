@@ -21,7 +21,7 @@ def write_idx_file(set_list, set_file):
                 f.write("%s" % idx)
 
 
-def split_dataset(data_path, image_sets, train_percentage):
+def split_dataset(data_path, train_percentage):
     """
     Split a data set to train and val sets, write the index txt files and save
     in ImageSets folder
@@ -42,6 +42,7 @@ def split_dataset(data_path, image_sets, train_percentage):
     if len(pcd_list) != len(label_list):
         assert print("num of pcd and label dismatch!")
 
+    image_sets = os.path.join(data_path, 'ImageSets')
     if os.path.exists(image_sets):
         pass
     else:
