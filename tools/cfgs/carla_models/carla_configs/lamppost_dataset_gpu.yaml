@@ -1,5 +1,5 @@
 DATASET: 'LamppostDataset'
-DATA_PATH: '/mnt/ssd/shishuyao/detection/carla/lamppost_train/dataset'
+DATA_PATH: '/mnt/ssd/shishuyao/detection/carla/lamppost_train/0121/dataset'
 
 POINT_CLOUD_RANGE: [0, -32, -2.5, 64, 32, 1.5]
 
