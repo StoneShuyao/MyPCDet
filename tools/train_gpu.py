@@ -34,6 +34,7 @@ def parse_config():
     parser.add_argument('--fix_random_seed', action='store_true', default=False, help='')
     parser.add_argument('--ckpt_save_interval', type=int, default=1, help='number of training epochs')
     parser.add_argument('--local_rank', type=int, default=0, help='local rank for distributed training')
+    parser.add_argument('--gpu_id', type=str, default="0", help='assign gpu to use')
     parser.add_argument('--max_ckpt_save_num', type=int, default=50, help='max number of saved checkpoint')
     parser.add_argument('--merge_all_iters_to_one_epoch', action='store_true', default=False, help='')
     parser.add_argument('--set', dest='set_cfgs', default=None, nargs=argparse.REMAINDER,
@@ -57,6 +58,8 @@ def parse_config():
 
 def main():
     args, cfg = parse_config()
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
+
     if args.launcher == 'none':
         dist_train = False
         total_gpus = 1
@@ -162,8 +165,8 @@ def main():
         start_epoch=start_epoch,
         total_epochs=args.epochs,
         start_iter=it,
-#        rank=cfg.LOCAL_RANK,
-        rank=args.local_rank,
+        rank=cfg.LOCAL_RANK,
+#         rank=args.local_rank,
         tb_log=tb_log,
         ckpt_save_dir=ckpt_dir,
         train_sampler=train_sampler,
