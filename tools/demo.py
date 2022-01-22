@@ -1,5 +1,6 @@
 import argparse
 import glob
+import time
 from pathlib import Path
 
 import mayavi.mlab as mlab
@@ -96,9 +97,18 @@ def main():
                 continue
 
             logger.info(f'Visualized sample index: \t{int(sample_id)}')
+
+            detect_start_time = time.time()
+
             data_dict = demo_dataset.collate_batch([data_dict])
             load_data_to_gpu(data_dict)
+
+            inf_start_time = time.time()
             pred_dicts, _ = model.forward(data_dict)
+
+            inf_end_time = time.time()
+            inf_time = inf_end_time - inf_start_time
+            print(inf_time)
 
             V.draw_scenes(
                 points=data_dict['points'][:, 1:], ref_boxes=pred_dicts[0]['pred_boxes'],
