@@ -162,7 +162,7 @@ def main():
         start_epoch=start_epoch,
         total_epochs=args.epochs,
         start_iter=it,
-        rank=cfg.LOCAL_RANK,
+        rank=cfg.local_rank,
         tb_log=tb_log,
         ckpt_save_dir=ckpt_dir,
         train_sampler=train_sampler,
