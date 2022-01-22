@@ -4,6 +4,25 @@ import shutil
 import fire
 
 
+def add_carla_lp_data_all(all_path, new_path):
+    collect_list = os.listdir(all_path)
+    for collect_iter in collect_list:
+        collect_path = os.path.join(all_path, collect_iter)
+        lp_list = os.listdir(collect_path)
+        for lp in lp_list:
+            lp_path = os.path.join(collect_path, lp)
+            data_path = os.path.join(lp_path, 'train_dataset')
+            add_new_data(data_path, new_path)
+
+
+def add_carla_vehicle_data_all(all_path, new_path):
+    collect_list = os.listdir(all_path)
+    for collect_iter in collect_list:
+        collect_path = os.path.join(all_path, collect_iter)
+        data_path = os.path.join(collect_path, 'train_dataset')
+        add_new_data(data_path, new_path)
+
+
 def add_new_data(data_path, new_path):
     """
     Add a set of newly collected data to the original/or a new dataset, the indexes
