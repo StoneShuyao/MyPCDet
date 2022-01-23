@@ -58,9 +58,9 @@ def parse_config():
 
 def main():
     args, cfg = parse_config()
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
 
     if args.launcher == 'none':
+        os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
         dist_train = False
         total_gpus = 1
     else:
@@ -166,7 +166,6 @@ def main():
         total_epochs=args.epochs,
         start_iter=it,
         rank=cfg.LOCAL_RANK,
-#         rank=args.local_rank,
         tb_log=tb_log,
         ckpt_save_dir=ckpt_dir,
         train_sampler=train_sampler,

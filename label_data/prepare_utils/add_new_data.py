@@ -5,6 +5,15 @@ import fire
 
 
 def add_carla_lp_data_all(all_path, new_path):
+    """
+    Summarize the multi lampposts data collected multiple times in this directory into one dataset at a time
+    Args:
+        all_path: path that contains multi lampposts data of multi times collection
+        new_path:dataset path
+
+    Returns:
+
+    """
     collect_list = os.listdir(all_path)
     for collect_iter in collect_list:
         collect_path = os.path.join(all_path, collect_iter)
@@ -16,6 +25,15 @@ def add_carla_lp_data_all(all_path, new_path):
 
 
 def add_carla_vehicle_data_all(all_path, new_path):
+    """
+    Summarize the vehicle data collected multiple times in this directory into one dataset at a time
+    Args:
+        all_path: path that contains vehicle data of multi times collection
+        new_path:
+
+    Returns:
+
+    """
     collect_list = os.listdir(all_path)
     for collect_iter in collect_list:
         collect_path = os.path.join(all_path, collect_iter)
