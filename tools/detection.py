@@ -1,6 +1,8 @@
 import argparse
 import glob
 from pathlib import Path
+import re
+import os
 
 import mayavi.mlab as mlab
 import numpy as np
@@ -49,9 +51,13 @@ class DetectionDataset(DatasetTemplate):
         else:
             raise NotImplementedError
 
+        sample_id = re.split(r'[/.]\s*', self.sample_file_list[index].strip())[-2]
+        # sample_id = self.sample_file_list[index]
+        # sample_id = self.sample_file_list[index].split('/')
+
         input_dict = {
             'points': points,
-            'frame_id': index,
+            'frame_id': sample_id,
         }
 
         data_dict = self.prepare_data(data_dict=input_dict)
@@ -64,21 +70,28 @@ def del_tensor_ele(arr, index):
     return torch.cat((arr1, arr2), dim=0)
 
 
-def filter_pred_dicts(pred_dicts, car, pedestrian, cyclist):
+def cls_type_to_name(cls_type):
+    type_to_name = {1: 'Car', 2: 'Pedestrian', 3: 'Cyclist'}
+    if cls_type not in type_to_name.keys():
+        return -1
+    return type_to_name[cls_type]
+
+
+def write_detection_files(pred_dicts, detection_file, car=0.5, pedestrian=0.5):
     """
     delete the objects with score lower than threshold of its class
+    and write them into the detection result file
     Args:
         pred_dicts: detected object dicts
+        detection_file: output file
         car: car threshold
         pedestrian: pedestrian threshold
-        cyclist: cyclist threshold
 
     Returns:
         filtered pred_dicts
     """
 
     gt_types = pred_dicts[0]['pred_labels'].cpu().numpy()
-    gt_boxes = pred_dicts[0]['pred_boxes'].cpu().numpy()
     scores = pred_dicts[0]['pred_scores'].cpu().numpy()
 
     if len(gt_types) == 0:
@@ -90,8 +103,6 @@ def filter_pred_dicts(pred_dicts, car, pedestrian, cyclist):
                 del_flag = 1
             elif gt_types[idx] == 2 and scores[idx] < pedestrian:
                 del_flag = 1
-            elif gt_types[idx] == 3 and scores[idx] < cyclist:
-                del_flag = 1
             else:
                 del_flag = 0
 
@@ -102,17 +113,46 @@ def filter_pred_dicts(pred_dicts, car, pedestrian, cyclist):
             else:
                 current_idx += 1
 
-    return pred_dicts
+    gt_types = pred_dicts[0]['pred_labels'].cpu().numpy()
+    gt_boxes = pred_dicts[0]['pred_boxes'].cpu().numpy()
+    scores = pred_dicts[0]['pred_scores'].cpu().numpy()
+    gt_names = [cls_type_to_name(type_id) for type_id in gt_types]
+
+    with open(detection_file, 'w') as f:
+        for i in range(len(gt_names)):
+            if i:
+                f.write("\n%s %f %f %f %f %f %f %f %f"
+                        % (gt_names[i], gt_boxes[i][0], gt_boxes[i][1], gt_boxes[i][2],
+                           gt_boxes[i][3], gt_boxes[i][4], gt_boxes[i][5],
+                           gt_boxes[i][6], scores[i]))
+            else:
+                f.write("%s %f %f %f %f %f %f %f %f"
+                        % (gt_names[i], gt_boxes[i][0], gt_boxes[i][1], gt_boxes[i][2],
+                           gt_boxes[i][3], gt_boxes[i][4], gt_boxes[i][5],
+                           gt_boxes[i][6], scores[i]))
+
+    return True
 
 
 def parse_config():
     parser = argparse.ArgumentParser(description='arg parser')
+
+    # basic args
     parser.add_argument('--cfg_file', type=str, default='cfgs/kitti_models/second.yaml',
                         help='specify the config for demo')
-    parser.add_argument('--data_path', type=str, default='demo_data',
-                        help='specify the point cloud data file or directory')
     parser.add_argument('--ckpt', type=str, default=None, help='specify the pretrained model')
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
+
+    # data and output path
+    parser.add_argument('--data_path', type=str, default='demo_data',
+                        help='specify the point cloud data file or directory')
+    parser.add_argument('--detection_path', type=str, default='data_label',
+                        help='specify the data label file or directory')
+
+    # detection threshold
+    parser.add_argument('--car_thres', type=float, default=0.5, help='confidence thres for vehicle detection')
+    parser.add_argument('--ped_thres', type=float, default=0.5, help='confidence thres for pedestrian detection')
+
 
     args = parser.parse_args()
 
@@ -124,34 +164,38 @@ def parse_config():
 def main():
     args, cfg = parse_config()
     logger = common_utils.create_logger()
-    logger.info('-----------------Detect the current frame-------------------------')
-    detection_dataset = DetectionDataset(
+    logger.info('-----------------Detecting of our Dataset by OpenPCDet-------------------------')
+    label_dataset = DetectionDataset(
         dataset_cfg=cfg.DATA_CONFIG, class_names=cfg.CLASS_NAMES, training=False,
         root_path=Path(args.data_path), ext=args.ext, logger=logger
     )
-    logger.info(f'Total number of samples: \t{len(detection_dataset)}')
+    logger.info(f'Total number of samples: \t{len(label_dataset)}')
+    detection_path = args.detection_path
+    if os.path.exists(detection_path):
+        pass
+    else:
+        os.makedirs(detection_path)
 
-    model = build_network(model_cfg=cfg.MODEL, num_class=len(cfg.CLASS_NAMES), dataset=detection_dataset)
+    model = build_network(model_cfg=cfg.MODEL, num_class=len(cfg.CLASS_NAMES), dataset=label_dataset)
     model.load_params_from_file(filename=args.ckpt, logger=logger, to_cpu=True)
     model.cuda()
     model.eval()
     with torch.no_grad():
-        for idx, data_dict in enumerate(detection_dataset):
+        for idx, data_dict in enumerate(label_dataset):
+            sample_id = data_dict['frame_id']
 
-            logger.info(f'Visualized sample index: \t{idx + 1}')
-            data_dict = detection_dataset.collate_batch([data_dict])
+            logger.info(f'Detecting sample index: \t{sample_id}')
+
+            data_dict = label_dataset.collate_batch([data_dict])
+            # print(data_dict['frame_id'])
+
             load_data_to_gpu(data_dict)
             pred_dicts, _ = model.forward(data_dict)
 
-            print(pred_dicts)
-            pred_dicts = filter_pred_dicts(pred_dicts=pred_dicts, car=thres_car,
-                              pedestrian=thres_pedestrian, cyclist=thres_cyclist)
-
-            V.draw_scenes(
-                points=data_dict['points'][:, 1:], ref_boxes=pred_dicts[0]['pred_boxes'],
-                ref_scores=pred_dicts[0]['pred_scores'], ref_labels=pred_dicts[0]['pred_labels']
-            )
-            mlab.show(stop=False)
+            # print(pred_dicts)
+            detection_file = os.path.join(detection_path, sample_id) + '.txt'
+            save_flag = write_detection_files(pred_dicts, detection_file,
+                                              car=args.car_thres, pedestrian=args.ped_thres)
 
     logger.info('Detection done.')
 
