@@ -12,5 +12,6 @@ pcdet/version.py
 *.pth
 *.zip
 *.sh
+ckpt/
 requirements.txt
 

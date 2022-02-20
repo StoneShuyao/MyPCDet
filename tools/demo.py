@@ -6,6 +6,7 @@ from pathlib import Path
 import mayavi.mlab as mlab
 import numpy as np
 import torch
+import re
 
 from pcdet.config import cfg, cfg_from_yaml_file
 from pcdet.datasets import DatasetTemplate
@@ -45,9 +46,11 @@ class DemoDataset(DatasetTemplate):
         else:
             raise NotImplementedError
 
+        sample_id = re.split(r'[/.]\s*', self.sample_file_list[index].strip())[-2]
+
         input_dict = {
             'points': points,
-            'frame_id': index,
+            'frame_id': sample_id,
         }
 
         data_dict = self.prepare_data(data_dict=input_dict)
@@ -93,7 +96,7 @@ def main():
             if int(sample_id) < int(args.start_from):
                 continue
 
-            if int(sample_id) % 5:
+            if int(sample_id) % 2:
                 continue
 
             logger.info(f'Visualized sample index: \t{int(sample_id)}')
