@@ -13,5 +13,6 @@ pcdet/version.py
 *.zip
 *.sh
 ckpt/
+results/
 requirements.txt
 
