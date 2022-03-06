@@ -230,7 +230,7 @@ def main():
     print('Mean Detection time', np.mean(seq_time_list))
 
     # save_result
-    save_folder = "./results/overhead/fusion/"
+    save_folder = "./results/overhead/detection/"
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
     save_file = "0305_150_frame"
