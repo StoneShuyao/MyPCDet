@@ -226,7 +226,7 @@ def main():
         seq_time = time_list[start_frame: start_frame + frame_number]
         seq_time_list += seq_time
 
-    seq_time_list = seq_time_list * 0.7 / len(seq_list)
+    seq_time_list = seq_time_list * 0.8 / len(seq_list)
     print('Mean Detection time', np.mean(seq_time_list))
 
     # save_result
